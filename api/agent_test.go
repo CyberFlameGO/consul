@@ -626,6 +626,57 @@ func TestAPI_AgentServiceAddress(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 }
+func TestAPI_AgentServiceSocket(t *testing.T) {
+	t.Parallel()
+	c, s := makeClient(t)
+	defer s.Stop()
+
+	agent := c.Agent()
+
+	reg1 := &AgentServiceRegistration{
+		Name:    "foo1",
+		Port:    8000,
+		Address: "192.168.0.42",
+	}
+	reg2 := &AgentServiceRegistration{
+		Name:       "foo2",
+		SocketPath: "/tmp/foo2.sock",
+	}
+
+	if err := agent.ServiceRegister(reg1); err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	if err := agent.ServiceRegister(reg2); err != nil {
+		t.Fatalf("err: %v", err)
+	}
+
+	services, err := agent.Services()
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+
+	if _, ok := services["foo1"]; !ok {
+		t.Fatalf("missing service: %v", services)
+	}
+	if _, ok := services["foo2"]; !ok {
+		t.Fatalf("missing service: %v", services)
+	}
+
+	if services["foo1"].Address != "192.168.0.42" {
+		t.Fatalf("missing Address field in service foo1: %v", services)
+	}
+
+	if services["foo2"].Address != "" {
+		t.Fatalf("missing Address field in service foo2: %v", services["foo2"])
+	}
+	if services["foo2"].SocketPath != "/tmp/foo2.sock" {
+		t.Fatalf("missing SocketPath field in service foo2: %v", services)
+	}
+
+	if err := agent.ServiceDeregister("foo"); err != nil {
+		t.Fatalf("err: %v", err)
+	}
+}
 
 func TestAPI_AgentEnableTagOverride(t *testing.T) {
 	t.Parallel()
