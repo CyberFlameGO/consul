@@ -667,13 +667,16 @@ func TestAPI_AgentServiceSocket(t *testing.T) {
 	}
 
 	if services["foo2"].Address != "" {
-		t.Fatalf("missing Address field in service foo2: %v", services["foo2"])
+		t.Fatalf("unexpected Address field in service foo2: %v", services["foo2"])
 	}
 	if services["foo2"].SocketPath != "/tmp/foo2.sock" {
-		t.Fatalf("missing SocketPath field in service foo2: %v", services)
+		t.Fatalf("missing SocketPath field in service foo2: %v", services["foo2"])
 	}
 
 	if err := agent.ServiceDeregister("foo"); err != nil {
+		t.Fatalf("err: %v", err)
+	}
+	if err := agent.ServiceDeregister("foo2"); err != nil {
 		t.Fatalf("err: %v", err)
 	}
 }
