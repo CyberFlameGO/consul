@@ -673,7 +673,7 @@ func TestAPI_AgentServiceSocket(t *testing.T) {
 		t.Fatalf("missing SocketPath field in service foo2: %v", services["foo2"])
 	}
 
-	if err := agent.ServiceDeregister("foo"); err != nil {
+	if err := agent.ServiceDeregister("foo1"); err != nil {
 		t.Fatalf("err: %v", err)
 	}
 	if err := agent.ServiceDeregister("foo2"); err != nil {
