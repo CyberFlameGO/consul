@@ -20,6 +20,8 @@ func (t RPCType) ALPNString() string {
 		return ALPN_RPCGossip
 	case RPCTLSInsecure:
 		return "" // unsupported
+	case RPCGRPC:
+		return ALPN_RPCGRPC
 	default:
 		return "" // unsupported
 	}
@@ -79,6 +81,7 @@ var RPCNextProtos = []string{
 	ALPN_RPCMultiplexV2,
 	ALPN_RPCSnapshot,
 	ALPN_RPCGossip,
+	ALPN_RPCGRPC,
 	ALPN_WANGossipPacket,
 	ALPN_WANGossipStream,
 }

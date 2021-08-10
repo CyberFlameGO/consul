@@ -9,6 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hashicorp/go-hclog"
+	msgpackrpc "github.com/hashicorp/net-rpc-msgpackrpc"
+	"github.com/hashicorp/serf/serf"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/time/rate"
+
 	"github.com/hashicorp/consul/agent/grpc"
 	"github.com/hashicorp/consul/agent/grpc/resolver"
 	"github.com/hashicorp/consul/agent/pool"
@@ -20,11 +26,6 @@ import (
 	"github.com/hashicorp/consul/sdk/testutil/retry"
 	"github.com/hashicorp/consul/testrpc"
 	"github.com/hashicorp/consul/tlsutil"
-	"github.com/hashicorp/go-hclog"
-	msgpackrpc "github.com/hashicorp/net-rpc-msgpackrpc"
-	"github.com/hashicorp/serf/serf"
-	"github.com/stretchr/testify/require"
-	"golang.org/x/time/rate"
 )
 
 func testClientConfig(t *testing.T) (string, *Config) {
@@ -490,6 +491,7 @@ func newClient(t *testing.T, config *Config) *Client {
 	return client
 }
 
+// TODO(rb): add tests for the wanfed/alpn variations
 func newDefaultDeps(t *testing.T, c *Config) Deps {
 	t.Helper()
 
@@ -522,7 +524,15 @@ func newDefaultDeps(t *testing.T, c *Config) Deps {
 		Tokens:          new(token.Store),
 		Router:          r,
 		ConnPool:        connPool,
-		GRPCConnPool:    grpc.NewClientConnPool(builder, grpc.TLSWrapper(tls.OutgoingRPCWrapper()), tls.UseTLS),
+		GRPCConnPool: grpc.NewClientConnPool(
+			builder,
+			nil,
+			grpc.TLSWrapper(tls.OutgoingRPCWrapper()),
+			nil,
+			tls.UseTLS,
+			true,
+			c.Datacenter,
+		),
 		LeaderForwarder: builder,
 		EnterpriseDeps:  newDefaultDepsEnterprise(t, logger, c),
 	}

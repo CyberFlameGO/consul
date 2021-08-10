@@ -11,11 +11,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	msgpackrpc "github.com/hashicorp/net-rpc-msgpackrpc"
+	"github.com/hashicorp/yamux"
+
 	"github.com/hashicorp/consul/agent/structs"
 	"github.com/hashicorp/consul/lib"
 	"github.com/hashicorp/consul/tlsutil"
-	msgpackrpc "github.com/hashicorp/net-rpc-msgpackrpc"
-	"github.com/hashicorp/yamux"
 )
 
 const defaultDialTimeout = 10 * time.Second
@@ -378,6 +379,7 @@ func (p *ConnPool) dial(
 // gateways.
 //
 // NOTE: There is a close mirror of this method in agent/consul/wanfed/wanfed.go:dial
+// NOTE: There is another close mirror of this method in agent/grpc/client.go.dialViaMeshGateway
 func DialTimeoutWithRPCTypeViaMeshGateway(
 	dc string,
 	nodeName string,
