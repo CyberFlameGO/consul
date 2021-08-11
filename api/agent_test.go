@@ -655,30 +655,16 @@ func TestAPI_AgentServiceSocket(t *testing.T) {
 		t.Fatalf("err: %v", err)
 	}
 
-	if _, ok := services["foo1"]; !ok {
-		t.Fatalf("missing service: %v", services)
-	}
-	if _, ok := services["foo2"]; !ok {
-		t.Fatalf("missing service: %v", services)
-	}
+	require.Contains(t, services, "foo1", "missing service foo1")
+	require.Contains(t, services, "foo2", "missing service foo2")
 
-	if services["foo1"].Address != "192.168.0.42" {
-		t.Fatalf("missing Address field in service foo1: %v", services)
-	}
+	require.Equal(t, "192.168.0.42", services["foo1"].Address,
+		"missing Address field in service foo1: %v", services["foo1"])
 
-	if services["foo2"].Address != "" {
-		t.Fatalf("unexpected Address field in service foo2: %v", services["foo2"])
-	}
-	if services["foo2"].SocketPath != "/tmp/foo2.sock" {
-		t.Fatalf("missing SocketPath field in service foo2: %v", services["foo2"])
-	}
-
-	if err := agent.ServiceDeregister("foo1"); err != nil {
-		t.Fatalf("err: %v", err)
-	}
-	if err := agent.ServiceDeregister("foo2"); err != nil {
-		t.Fatalf("err: %v", err)
-	}
+	require.Equal(t, "", services["foo2"].Address,
+		"unexpected Address field in service foo1: %v", services["foo2"])
+	require.Equal(t, "/tmp/foo2.sock", services["foo2"].SocketPath,
+		"missing SocketPath field in service foo1: %v", services["foo2"])
 }
 
 func TestAPI_AgentEnableTagOverride(t *testing.T) {
